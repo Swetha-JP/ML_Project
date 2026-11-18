@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  # ── FastAPI Backend ───────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: athletesafe-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./athletesafe.db
+      - SECRET_KEY=${SECRET_KEY:-athletesafe-change-in-production}
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:80,http://frontend
+      - ENVIRONMENT=production
+      - DEBUG=false
+    volumes:
+      - backend_data:/app/athletesafe.db
+      - uploads_data:/app/uploads
+      - model_data:/app/ml/models
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── React Frontend ────────────────────────────────────────
+  frontend:
+    build:
+      context: ./athletesafe
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8000
+    container_name: athletesafe-web
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  backend_data:
+  uploads_data:
+  model_data:
