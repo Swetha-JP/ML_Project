@@ -8,8 +8,11 @@ __pycache__/
 dist/
 build/
 *.egg
+
+# Environment files
 .env
-*.env
+.env.*
+!athletesafe/.env.production
 
 # Virtual environments
 venv/
@@ -30,8 +33,8 @@ yarn-debug.log*
 *.sqlite3
 
 # ML models (large binary files)
-# Uncomment below if you don't want to push the model
-# backend/ml/models/*.pkl
+backend/ml/models/*.pkl
+backend/ml/models/*.joblib
 
 # OS
 .DS_Store
